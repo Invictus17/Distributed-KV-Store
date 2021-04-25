@@ -1,6 +1,12 @@
 {
     "1": {
                   "1": [
+                    {"message": {"type": "GET", "key": "m1", "delay": 2}, "port": 8082}
+                  ]
+
+        },
+    "2": {
+                  "1": [
 
                     {"message": {"type": "STORE", "key": "m1", "value": "m1", "delay": 0}, "port": 8081},
                     {"message": {"type": "STORE", "key": "m1", "value": "m2", "delay": 1}, "port": 8081},
@@ -15,7 +21,7 @@
 
         },
 
-    "2": {
+    "3": {
                   "1": [
 
                     {"message": {"type": "GET", "key": "m1", "delay": 0}, "port": 8081},
@@ -30,7 +36,7 @@
                    ]
         },
 
-  "3": {
+  "4": {
                   "1": [
 
                     {"message": {"type": "GET", "key": "m1", "delay": 0}, "port": 8081},

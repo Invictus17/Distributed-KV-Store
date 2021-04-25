@@ -62,7 +62,7 @@ def main(case, num_kv_processes, num_clients, ports, output_sleep):
 
 if __name__ == "__main__":
     # PLEASE DEFINE YOUR CASE (refer the report or the comments below to choose one)
-    case = 3
+    case = 1
 
     dirs = ['logs']
 
@@ -83,7 +83,7 @@ if __name__ == "__main__":
     messages, num_kv_processes, num_clients, ports, output_sleep = None, None, None, None, None
     if case == 1:
         num_kv_processes = 2
-        num_clients = 2
+        num_clients = 1
         ports = [8081, 8082]
         output_sleep = 5
 

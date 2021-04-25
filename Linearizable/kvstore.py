@@ -19,10 +19,12 @@ class server:
         heapq.heapify(self.Q)
         self.lamport_clock = 0
         self.message_ACKs = {}
+        self.read_ACKS = {}
         self.final = []
         self.keep_alive = True
 
         self.dict_key_val = {}
+        self.process_reads = {}
 
     def tcp_send(self, message, port):
         client_socket = socket(AF_INET, SOCK_STREAM)
@@ -37,7 +39,7 @@ class server:
     def tcp_thread_work(self, connect_socket, address, my_port, ports, id):
         host = "localhost"
         message = None
-
+        r_tom_message = None
         try:
             message = connect_socket.recv(MESSAGE_LEN)
             message = pickle.loads(message)
@@ -55,12 +57,32 @@ class server:
             if message['type'] == 'GET':
                 key = message['key']
                 time.sleep(message['delay'])
-                if self.dict_key_val.get(key):
-                    logging.info("Key found")
-                    connect_socket.sendall(str.encode(self.dict_key_val[key]))
-                else:
-                    logging.info("Key not found")
-                    connect_socket.sendall(str.encode("Key not found"))
+
+                r_tom_message = {}
+
+                publish_LC = None
+
+                self.lock.acquire()
+                self.lamport_clock += 1
+                publish_LC = self.lamport_clock
+                logging.info("LAMPORT: {}".format(self.lamport_clock))
+                self.read_ACKS[message['key'] + "_" + str(publish_LC)] = []
+                self.lock.release()
+
+                r_tom_message['lamport'] = (publish_LC, id)
+                r_tom_message['type'] = 'RTOM'
+                r_tom_message['key'] = message['key']
+
+                # Broadcast this message
+                for port in ports:
+                    if port != my_port:
+                        logging.info("RTOM Message to be issued: {} to: {}".format(r_tom_message, (host, port)))
+                        self.tcp_send(r_tom_message, port)
+
+                self.lock.acquire()
+                heapq.heappush(self.Q, (
+                    r_tom_message['lamport'][0], r_tom_message['lamport'][1], r_tom_message['key'], None))
+                self.lock.release()
 
             # client requests to store a key
             # {"type": "STORE", 'key': "m1", "value": 0}
@@ -88,7 +110,7 @@ class server:
 
                 self.lock.acquire()
                 heapq.heappush(self.Q, (
-                tom_message['lamport'][0], tom_message['lamport'][1], tom_message['key'], tom_message['value']))
+                    tom_message['lamport'][0], tom_message['lamport'][1], tom_message['key'], tom_message['value']))
                 self.lock.release()
 
             elif message['type'] == "TOM_ACK":
@@ -124,6 +146,40 @@ class server:
                         logging.info("ACK Message to be issued: {} to: {}".format(ACK, (host, port)))
                         self.tcp_send(ACK, port)
 
+
+            elif message['type'] == 'RTOM':
+                self.lock.acquire()
+
+                if not self.read_ACKS.get(message['key'] + "_" + str(message['lamport'][0])):
+                    self.read_ACKS[message['key'] + "_" + str(message['lamport'][0])] = []
+
+                logging.info("LAMPORT MAX: {} {}".format(self.lamport_clock, message['lamport'][0]))
+                self.lamport_clock = max(self.lamport_clock, int(message['lamport'][0])) + 1
+                logging.info("LAMPORT: {}".format(self.lamport_clock))
+                heapq.heappush(self.Q, (message['lamport'][0], message['lamport'][1], message['key'], None))
+                self.read_ACKS[message['key'] + "_" + str(message['lamport'][0])].append((self.lamport_clock, id))
+                self.lock.release()
+
+                # Broadcast an RACK
+                RACK = {"type": "RACK", 'key': message['key'], 'lamport': (self.lamport_clock, id)}
+
+                for port in ports:
+                    if port != my_port:
+                        logging.info("RACK Message to be issued: {} to: {}".format(RACK, (host, port)))
+                        self.tcp_send(RACK, port)
+
+            elif message['type'] == "RACK":
+                self.lock.acquire()
+                logging.info("LAMPORT MAX: {} {}".format(self.lamport_clock, message['lamport'][0]))
+                self.lamport_clock = max(self.lamport_clock, int(message['lamport'][0])) + 1
+                logging.info("LAMPORT: {}".format(self.lamport_clock))
+
+                if self.message_ACKs.get(message['key'] + "_" + str(message['lamport'][0])) is not None:
+                    self.message_ACKs[message['key'] + "_" + str(message['lamport'][0])].append(message['lamport'])
+                else:
+                    self.message_ACKs[message['key'] + "_" + str(message['lamport'][0])] = [message['lamport']]
+                self.lock.release()
+
             # Check queue
             logging.info("ACKS: {}".format(self.message_ACKs))
 
@@ -133,7 +189,13 @@ class server:
                         m = "SET key:" + message['key']
                         connect_socket.send(m.encode())
                         break
-                    time.sleep(2)
+
+            if message['type'] == "GET":
+                while True:
+                    if self.process_reads.get(str(r_tom_message['lamport']) + "_" + str(r_tom_message['lamport'])):
+                        m = self.process_reads[str(r_tom_message['lamport']) + "_" + str(r_tom_message['lamport'])]
+                        connect_socket.send(m.encode())
+                        break
 
             connect_socket.close()
         except error:
@@ -143,14 +205,25 @@ class server:
         while True:
             self.lock.acquire()
             logging.info("self.Q: {}".format(self.Q))
-            while self.Q and len(self.message_ACKs[self.Q[0][2] + "_" + self.Q[0][3]]) == len(ports) - 1:
+            logging.info("CCCCC: {}".format(self.read_ACKS))
+
+            if self.Q and self.Q[0][3] is None and self.read_ACKS.get(self.Q[0][2] + "_" + str(self.Q[0][0])):
+                if len(self.read_ACKS[self.Q[0][2] + "_" + str(self.Q[0][0])]) == len(ports) - 1:
+                    clock, id, key, value = heapq.heappop(self.Q)
+                    logging.info("READ CAN TAKE PLACE#########")
+                    self.process_reads[str(key) + "_" + str(clock)] = True
+                    self.final.append((key, value))
+                    logging.info("######################Final: {}".format(self.final))
+                logging.info("WHATTTT: {} {}".format(self.Q, self.read_ACKS))
+
+            if self.Q and self.Q[0][3] is not None and len(self.message_ACKs[self.Q[0][2] + "_" + self.Q[0][3]]) == len(
+                    ports) - 1:
                 clock, id, key, value = heapq.heappop(self.Q)
 
                 self.dict_key_val[key] = value
                 logging.info("Message committed: {}".format(key + ':' + value))
                 self.final.append((key, value))
                 logging.info("######################Final: {}".format(self.final))
-
 
             self.lock.release()
             time.sleep(2)
