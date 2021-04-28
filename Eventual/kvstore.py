@@ -65,31 +65,14 @@ class server:
             # client requests to store a key
             # {"type": "STORE", 'key': "m1", "value": 0}
             elif message['type'] == "STORE":
-                tom_message = {}
-
-                publish_LC = None
                 time.sleep(message['delay'])
                 self.lock.acquire()
-                self.lamport_clock += 1
-                publish_LC = self.lamport_clock
-                logging.info("LAMPORT: {}".format(self.lamport_clock))
-                self.message_ACKs[message['key'] + "_" + message['value']] = []
-                self.lock.release()
+                self.dict_key_val[message['key']] = message['value']
 
-                tom_message['lamport'] = (publish_LC, id)
-                tom_message['type'] = 'TOM'
-                tom_message['key'] = message['key']
-                tom_message['value'] = message['value']
-                # Broadcast this message
-                for port in ports:
-                    if port != my_port:
-                        logging.info("TOM Message to be issued: {} to: {}".format(tom_message, (host, port)))
-                        self.tcp_send(tom_message, port)
-
+                # send to propogate
+                propogate(message, port)
                 self.lock.acquire()
-                heapq.heappush(self.Q, (
-                tom_message['lamport'][0], tom_message['lamport'][1], tom_message['key'], tom_message['value']))
-                self.lock.release()
+            elif message['type'] == 'propagate':
 
 
             connect_socket.close()

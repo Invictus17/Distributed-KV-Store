@@ -12,7 +12,7 @@ MESSAGE_LEN = 512
 
 
 def main(case, num_kv_processes, num_clients, ports, output_sleep):
-    process = 'python kvstore.py'
+    process = 'python kv.py'
 
     client = 'python client.py'
 
@@ -62,7 +62,7 @@ def main(case, num_kv_processes, num_clients, ports, output_sleep):
 
 if __name__ == "__main__":
     # PLEASE DEFINE YOUR CASE (refer the report or the comments below to choose one)
-    case = 1
+    case = 4
 
     dirs = ['logs']
 
@@ -89,11 +89,16 @@ if __name__ == "__main__":
 
     elif case == 2:
         num_kv_processes = 2
-        num_clients = 2
+        num_clients = 1
         ports = [8081, 8082]
         output_sleep = 7
 
     elif case == 3:
+        num_kv_processes = 3
+        num_clients = 2
+        ports = [8081, 8082, 8083]
+        output_sleep = 15
+    elif case == 4:
         num_kv_processes = 3
         num_clients = 2
         ports = [8081, 8082, 8083]

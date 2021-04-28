@@ -14,14 +14,15 @@ MESSAGE_LEN = 512
 
 class server:
     def __init__(self):
-        self.lock = threading.Lock()
+        self.lock = threading.Condition()
         self.Q = []
         heapq.heapify(self.Q)
         self.lamport_clock = 0
         self.message_ACKs = {}
         self.final = []
         self.keep_alive = True
-
+        self.wait_cond = None
+        self.wait_queue = False
         self.dict_key_val = {}
 
     def tcp_send(self, message, port):
@@ -37,7 +38,7 @@ class server:
     def tcp_thread_work(self, connect_socket, address, my_port, ports, id):
         host = "localhost"
         message = None
-
+        tom_message = None
         try:
             message = connect_socket.recv(MESSAGE_LEN)
             message = pickle.loads(message)
@@ -45,6 +46,7 @@ class server:
             # For the purpose of testing the application
             if message['type'] == 'get_result':
                 logging.info("Store key length, data: {} {}".format(len(self.dict_key_val), self.dict_key_val))
+                logging.info("Q: {}".format(self.Q))
                 logging.info("FINAL ORDER: {}".format(self.final))
                 return
 
@@ -88,7 +90,7 @@ class server:
 
                 self.lock.acquire()
                 heapq.heappush(self.Q, (
-                tom_message['lamport'][0], tom_message['lamport'][1], tom_message['key'], tom_message['value']))
+                tom_message['lamport'][0], tom_message['lamport'][1], tom_message['key'], tom_message['value'], True))
                 self.lock.release()
 
             elif message['type'] == "TOM_ACK":
@@ -112,7 +114,7 @@ class server:
                 logging.info("LAMPORT MAX: {} {}".format(self.lamport_clock, message['lamport'][0]))
                 self.lamport_clock = max(self.lamport_clock, int(message['lamport'][0])) + 1
                 logging.info("LAMPORT: {}".format(self.lamport_clock))
-                heapq.heappush(self.Q, (message['lamport'][0], message['lamport'][1], message['key'], message['value']))
+                heapq.heappush(self.Q, (message['lamport'][0], message['lamport'][1], message['key'], message['value'], False))
                 self.message_ACKs[message['key'] + "_" + message['value']].append((self.lamport_clock, id))
                 self.lock.release()
                 # Broadcast an ACK
@@ -128,12 +130,22 @@ class server:
             logging.info("ACKS: {}".format(self.message_ACKs))
 
             if message['type'] == 'STORE':
+                self.lock.acquire()
+
                 while True:
-                    if self.dict_key_val.get(message['key']):
-                        m = "SET key:" + message['key']
-                        connect_socket.send(m.encode())
+                    if self.wait_cond == tom_message['lamport']:
                         break
-                    time.sleep(2)
+                    else:
+                        self.lock.wait()
+
+                logging.info("CHECKKKK: {} {}".format(message['key'], message['value']))
+                if self.dict_key_val.get(message['key']):
+                    m = "SET key:" + message['key'] + message['value']
+                    connect_socket.send(m.encode())
+
+                self.wait_queue = False
+                self.lock.notify_all()
+                self.lock.release()
 
             connect_socket.close()
         except error:
@@ -141,19 +153,23 @@ class server:
 
     def check_queue(self, ports):
         while True:
-            self.lock.acquire()
-            logging.info("self.Q: {}".format(self.Q))
-            while self.Q and len(self.message_ACKs[self.Q[0][2] + "_" + self.Q[0][3]]) == len(ports) - 1:
-                clock, id, key, value = heapq.heappop(self.Q)
+            if self.Q:
+                logging.info("WAITTT {}".format(self.Q))
+            if self.Q and self.wait_queue is False and len(self.message_ACKs[self.Q[0][2] + "_" + self.Q[0][3]]) == len(ports) - 1:
+                logging.info("self.Q: {}".format(self.Q))
+                self.lock.acquire()
+                clock, id, key, value, self.wait_queue = heapq.heappop(self.Q)
 
                 self.dict_key_val[key] = value
                 logging.info("Message committed: {}".format(key + ':' + value))
                 self.final.append((key, value))
                 logging.info("######################Final: {}".format(self.final))
+                self.wait_cond = (clock, id)
+                if self.wait_queue:
+                    self.lock.notify_all()
+                    self.lock.wait()
+                self.lock.release()
 
-
-            self.lock.release()
-            time.sleep(2)
 
     def main(self, my_port, ports, id):
         # citing: https://docs.python.org/2/howto/logging-cookbook.html#multiple-handlers-and-formatters
