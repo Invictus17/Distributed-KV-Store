@@ -1,8 +1,0 @@
-2021-04-18 19:19:04 Client_1: Request: {'type': 'GET', 'key': 'm1', 'delay': 0}
-2021-04-18 19:19:04 Client_1: Response: Key not found
-2021-04-18 19:19:04 Client_1: Request: {'type': 'STORE', 'key': 'm2', 'value': 'm2', 'delay': 0}
-2021-04-18 19:19:06 Client_1: Response: SET key:m2
-2021-04-18 19:19:06 Client_1: Request: {'type': 'GET', 'key': 'm5', 'delay': 0}
-2021-04-18 19:19:06 Client_1: Response: m5
-2021-04-18 19:19:06 Client_1: Request: {'type': 'GET', 'key': 'm6', 'delay': 0}
-2021-04-18 19:19:06 Client_1: Response: Key not found

@@ -47,6 +47,7 @@ class server:
             if message['type'] == 'get_result':
                 logging.info("Store key length, data: {} {}".format(len(self.dict_key_val), self.dict_key_val))
                 logging.info("Q: {}".format(self.Q))
+                time.sleep(1.5)
                 logging.info("FINAL ORDER: {}".format(self.final))
                 return
 
@@ -91,6 +92,7 @@ class server:
                 self.lock.acquire()
                 heapq.heappush(self.Q, (
                 tom_message['lamport'][0], tom_message['lamport'][1], tom_message['key'], tom_message['value'], True))
+                logging.info("DEBUG: {}".format(self.Q))
                 self.lock.release()
 
             elif message['type'] == "TOM_ACK":
@@ -108,13 +110,14 @@ class server:
             elif message['type'] == 'TOM':
                 self.lock.acquire()
 
-                if not self.message_ACKs.get(message['key'] + "_" + message['value']):
+                if self.message_ACKs.get(message['key'] + "_" + message['value']) is None:
                     self.message_ACKs[message['key'] + "_" + message['value']] = []
 
                 logging.info("LAMPORT MAX: {} {}".format(self.lamport_clock, message['lamport'][0]))
                 self.lamport_clock = max(self.lamport_clock, int(message['lamport'][0])) + 1
                 logging.info("LAMPORT: {}".format(self.lamport_clock))
                 heapq.heappush(self.Q, (message['lamport'][0], message['lamport'][1], message['key'], message['value'], False))
+                logging.info("DEBUG: {}".format(self.Q))
                 self.message_ACKs[message['key'] + "_" + message['value']].append((self.lamport_clock, id))
                 self.lock.release()
                 # Broadcast an ACK
@@ -138,7 +141,6 @@ class server:
                     else:
                         self.lock.wait()
 
-                logging.info("CHECKKKK: {} {}".format(message['key'], message['value']))
                 if self.dict_key_val.get(message['key']):
                     m = "SET key:" + message['key'] + message['value']
                     connect_socket.send(m.encode())
@@ -153,11 +155,10 @@ class server:
 
     def check_queue(self, ports):
         while True:
-            if self.Q:
-                logging.info("WAITTT {}".format(self.Q))
+            self.lock.acquire()
             if self.Q and self.wait_queue is False and len(self.message_ACKs[self.Q[0][2] + "_" + self.Q[0][3]]) == len(ports) - 1:
                 logging.info("self.Q: {}".format(self.Q))
-                self.lock.acquire()
+
                 clock, id, key, value, self.wait_queue = heapq.heappop(self.Q)
 
                 self.dict_key_val[key] = value
@@ -168,8 +169,8 @@ class server:
                 if self.wait_queue:
                     self.lock.notify_all()
                     self.lock.wait()
-                self.lock.release()
-
+            self.lock.release()
+            time.sleep(0.5)
 
     def main(self, my_port, ports, id):
         # citing: https://docs.python.org/2/howto/logging-cookbook.html#multiple-handlers-and-formatters

@@ -1,6 +1,0 @@
-2021-04-18 19:19:04 Client_2: Request: {'type': 'STORE', 'key': 'm5', 'value': 'm5', 'delay': 0}
-2021-04-18 19:19:06 Client_2: Response: SET key:m5
-2021-04-18 19:19:06 Client_2: Request: {'type': 'STORE', 'key': 'm6', 'value': 'm6', 'delay': 0}
-2021-04-18 19:19:08 Client_2: Response: SET key:m6
-2021-04-18 19:19:08 Client_2: Request: {'type': 'GET', 'key': 'm2', 'delay': 0}
-2021-04-18 19:19:08 Client_2: Response: m2

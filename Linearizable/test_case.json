@@ -14,6 +14,14 @@
                     {"message": {"type": "GET", "key": "m1", "delay": 0}, "port": 8081}
 
 
+                  ],
+                  "2": [
+
+                    {"message": {"type": "STORE", "key": "m3", "value": "m3", "delay": 0}, "port": 8081},
+                    {"message": {"type": "STORE", "key": "m4", "value": "m4", "delay": 1}, "port": 8081},
+                    {"message": {"type": "GET", "key": "m4", "delay": 0}, "port": 8081}
+
+
                   ]
         },
 
@@ -47,14 +55,149 @@
                   "2" : [
                     {"message": {"type": "STORE", "key": "m5", "value": "m5", "delay": 3}, "port": 8082},
                     {"message": {"type": "STORE", "key": "m6", "value": "m6", "delay": 1}, "port": 8083},
+                    {"message": {"type": "GET", "key": "m6", "delay": 0}, "port": 8082},
+                    {"message": {"type": "GET", "key": "m7", "delay": 0}, "port": 8083},
                     {"message": {"type": "STORE", "key": "m7", "value": "m7", "delay": 0}, "port": 8081},
                     {"message": {"type": "STORE", "key": "m8", "value": "m8", "delay": 1}, "port": 8082},
                     {"message": {"type": "STORE", "key": "m9", "value": "m9", "delay": 0}, "port": 8083},
                     {"message": {"type": "GET", "key": "m5", "delay": 5}, "port": 8081},
-                    {"message": {"type": "GET", "key": "m6", "delay": 0}, "port": 8082},
-                    {"message": {"type": "GET", "key": "m7", "delay": 0}, "port": 8083},
                     {"message": {"type": "GET", "key": "m8", "delay": 0}, "port": 8083},
                     {"message": {"type": "GET", "key": "m9", "delay": 0}, "port": 8082}
                   ]
-        }
+        },
+  "5": {
+
+                  "1": [
+                      {"message": {"type": "STORE", "key": "m1", "value": "m1", "delay": 3}, "port": 8081},
+                      {"message": {"type": "STORE", "key": "m2", "value": "m2", "delay": 1}, "port": 8082},
+                      {"message": {"type": "GET", "key": "m2", "delay": 0}, "port": 8083}
+                  ],
+
+                  "2" : [
+                    {"message": {"type": "STORE", "key": "m3", "value": "m3", "delay": 3}, "port": 8082},
+                    {"message": {"type": "STORE", "key": "m4", "value": "m4", "delay": 1}, "port": 8083},
+                    {"message": {"type": "GET", "key": "m5", "delay": 0}, "port": 8081}
+                  ],
+                  "3" : [
+                    {"message": {"type": "STORE", "key": "m5", "value": "m5", "delay": 3}, "port": 8081},
+                    {"message": {"type": "STORE", "key": "m6", "value": "m6", "delay": 1}, "port": 8083},
+                    {"message": {"type": "GET", "key": "m7", "delay": 0}, "port": 8082}
+                  ],
+                  "4" : [
+                    {"message": {"type": "STORE", "key": "m7", "value": "m7", "delay": 2}, "port": 8082},
+                    {"message": {"type": "STORE", "key": "m8", "value": "m8", "delay": 1}, "port": 8083},
+                    {"message": {"type": "GET", "key": "m4", "delay": 0}, "port": 8081}
+                  ],
+                  "5" : [
+                    {"message": {"type": "STORE", "key": "m9", "value": "m9", "delay": 2}, "port": 8081},
+                    {"message": {"type": "STORE", "key": "m10", "value": "m10", "delay": 1}, "port": 8082},
+                    {"message": {"type": "GET", "key": "m8", "delay": 0}, "port": 8081}
+                  ],
+                  "6": [
+                    {"message": {"type": "STORE", "key": "m11", "value": "m11", "delay": 3}, "port": 8081},
+                    {"message": {"type": "STORE", "key": "m12", "value": "m12", "delay": 1}, "port": 8082},
+                    {"message": {"type": "GET", "key": "m11", "delay": 0}, "port": 8084}
+                  ],
+
+                  "7" : [
+                    {"message": {"type": "STORE", "key": "m13", "value": "m13", "delay": 3}, "port": 8082},
+                    {"message": {"type": "STORE", "key": "m14", "value": "m14", "delay": 1}, "port": 8083}
+                  ],
+                  "8" : [
+                    {"message": {"type": "STORE", "key": "m15", "value": "m15", "delay": 3}, "port": 8081},
+                    {"message": {"type": "STORE", "key": "m16", "value": "m16", "delay": 1}, "port": 8083}
+                  ],
+                  "9" : [
+                    {"message": {"type": "STORE", "key": "m17", "value": "m17", "delay": 2}, "port": 8082},
+                    {"message": {"type": "STORE", "key": "m18", "value": "m18", "delay": 1}, "port": 8083}
+                  ],
+                  "10" : [
+                    {"message": {"type": "STORE", "key": "m19", "value": "m19", "delay": 2}, "port": 8081},
+                    {"message": {"type": "STORE", "key": "m20", "value": "m20", "delay": 1}, "port": 8082}
+                  ],
+                  "11": [
+                    {"message": {"type": "STORE", "key": "m21", "value": "m21", "delay": 3}, "port": 8081},
+                    {"message": {"type": "STORE", "key": "m22", "value": "m22", "delay": 1}, "port": 8082}
+                  ],
+
+                  "12" : [
+                    {"message": {"type": "STORE", "key": "m23", "value": "m23", "delay": 3}, "port": 8082},
+                    {"message": {"type": "STORE", "key": "m24", "value": "m24", "delay": 1}, "port": 8083}
+                  ],
+                  "13" : [
+                    {"message": {"type": "STORE", "key": "m25", "value": "m25", "delay": 3}, "port": 8081},
+                    {"message": {"type": "STORE", "key": "m26", "value": "m26", "delay": 1}, "port": 8083}
+                  ],
+                  "14" : [
+                    {"message": {"type": "STORE", "key": "m27", "value": "m27", "delay": 2}, "port": 8082},
+                    {"message": {"type": "STORE", "key": "m28", "value": "m28", "delay": 1}, "port": 8083}
+                  ],
+                  "15" : [
+                    {"message": {"type": "STORE", "key": "m29", "value": "m29", "delay": 2}, "port": 8081},
+                    {"message": {"type": "STORE", "key": "m30", "value": "m30", "delay": 1}, "port": 8082}
+                  ],
+                  "16": [
+                    {"message": {"type": "STORE", "key": "m31", "value": "m31", "delay": 3}, "port": 8081},
+                    {"message": {"type": "STORE", "key": "m32", "value": "m32", "delay": 1}, "port": 8082}
+                  ],
+
+                  "17" : [
+                    {"message": {"type": "STORE", "key": "m33", "value": "m33", "delay": 3}, "port": 8082},
+                    {"message": {"type": "STORE", "key": "m34", "value": "m34", "delay": 1}, "port": 8083}
+                  ],
+                  "18" : [
+                    {"message": {"type": "STORE", "key": "m35", "value": "m35", "delay": 3}, "port": 8081},
+                    {"message": {"type": "STORE", "key": "m36", "value": "m36", "delay": 1}, "port": 8083}
+                  ],
+                  "19" : [
+                    {"message": {"type": "STORE", "key": "m37", "value": "m37", "delay": 2}, "port": 8082},
+                    {"message": {"type": "STORE", "key": "m38", "value": "m38", "delay": 1}, "port": 8083}
+                  ],
+                  "20" : [
+                    {"message": {"type": "STORE", "key": "m39", "value": "m39", "delay": 2}, "port": 8081},
+                    {"message": {"type": "STORE", "key": "m40", "value": "m40", "delay": 1}, "port": 8082}
+                  ],
+                "21" : [
+                                {"message": {"type": "GET", "key": "m1", "delay": 20}, "port": 8083},
+                                {"message": {"type": "GET", "key": "m2", "delay": 0}, "port": 8083},
+                                {"message": {"type": "GET", "key": "m3", "delay": 0}, "port": 8082},
+                                {"message": {"type": "GET", "key": "m4", "delay": 0}, "port": 8082},
+                                {"message": {"type": "GET", "key": "m5", "delay": 0}, "port": 8081},
+                                {"message": {"type": "GET", "key": "m6", "delay": 0}, "port": 8081},
+                                {"message": {"type": "GET", "key": "m7", "delay": 0}, "port": 8083},
+                                {"message": {"type": "GET", "key": "m8", "delay": 0}, "port": 8082},
+                                {"message": {"type": "GET", "key": "m9", "delay": 0}, "port": 8081},
+                                {"message": {"type": "GET", "key": "m10", "delay": 0}, "port": 8082},
+                                {"message": {"type": "GET", "key": "m11", "delay": 0}, "port": 8083},
+                                {"message": {"type": "GET", "key": "m12", "delay": 0}, "port": 8081},
+                                {"message": {"type": "GET", "key": "m13", "delay": 0}, "port": 8082},
+                                {"message": {"type": "GET", "key": "m14", "delay": 0}, "port": 8083},
+                                {"message": {"type": "GET", "key": "m15", "delay": 0}, "port": 8081},
+                                {"message": {"type": "GET", "key": "m16", "delay": 0}, "port": 8082},
+                                {"message": {"type": "GET", "key": "m17", "delay": 0}, "port": 8083},
+                                {"message": {"type": "GET", "key": "m18", "delay": 0}, "port": 8081},
+                                {"message": {"type": "GET", "key": "m19", "delay": 0}, "port": 8082},
+                                {"message": {"type": "GET", "key": "m20", "delay": 0}, "port": 8081},
+                                {"message": {"type": "GET", "key": "m21", "delay": 0}, "port": 8082},
+                                {"message": {"type": "GET", "key": "m22", "delay": 0}, "port": 8083},
+                                {"message": {"type": "GET", "key": "m23", "delay": 0}, "port": 8082},
+                                {"message": {"type": "GET", "key": "m24", "delay": 0}, "port": 8082},
+                                {"message": {"type": "GET", "key": "m25", "delay": 0}, "port": 8081},
+                                {"message": {"type": "GET", "key": "m26", "delay": 0}, "port": 8081},
+                                {"message": {"type": "GET", "key": "m27", "delay": 0}, "port": 8083},
+                                {"message": {"type": "GET", "key": "m28", "delay": 0}, "port": 8082},
+                                {"message": {"type": "GET", "key": "m29", "delay": 0}, "port": 8081},
+                                {"message": {"type": "GET", "key": "m30", "delay": 0}, "port": 8082},
+                                {"message": {"type": "GET", "key": "m31", "delay": 0}, "port": 8083},
+                                {"message": {"type": "GET", "key": "m32", "delay": 0}, "port": 8081},
+                                {"message": {"type": "GET", "key": "m33", "delay": 0}, "port": 8082},
+                                {"message": {"type": "GET", "key": "m34", "delay": 0}, "port": 8083},
+                                {"message": {"type": "GET", "key": "m35", "delay": 0}, "port": 8081},
+                                {"message": {"type": "GET", "key": "m36", "delay": 0}, "port": 8082},
+                                {"message": {"type": "GET", "key": "m37", "delay": 0}, "port": 8083},
+                                {"message": {"type": "GET", "key": "m38", "delay": 0}, "port": 8081},
+                                {"message": {"type": "GET", "key": "m39", "delay": 0}, "port": 8082},
+                                {"message": {"type": "GET", "key": "m40", "delay": 0}, "port": 8081}
+                ]
+  }
 }

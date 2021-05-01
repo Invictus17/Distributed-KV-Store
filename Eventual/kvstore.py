@@ -4,7 +4,6 @@ import argparse
 from socket import *
 import logging
 import pickle
-import heapq
 import time
 import threading
 import os
@@ -15,13 +14,6 @@ MESSAGE_LEN = 512
 class server:
     def __init__(self):
         self.lock = threading.Lock()
-        self.Q = []
-        heapq.heapify(self.Q)
-        self.lamport_clock = 0
-        self.message_ACKs = {}
-        self.final = []
-        self.keep_alive = True
-
         self.dict_key_val = {}
 
     def tcp_send(self, message, port):
@@ -45,9 +37,7 @@ class server:
             # For the purpose of testing the application
             if message['type'] == 'get_result':
                 logging.info("Store key length, data: {} {}".format(len(self.dict_key_val), self.dict_key_val))
-                logging.info("FINAL ORDER: {}".format(self.final))
-                return
-
+                connect_socket.close()
             logging.info("Message: {} from: {}".format(message, address))
 
             # Client request a key
@@ -61,21 +51,27 @@ class server:
                 else:
                     logging.info("Key not found")
                     connect_socket.sendall(str.encode("Key not found"))
-
+                connect_socket.close()
             # client requests to store a key
             # {"type": "STORE", 'key': "m1", "value": 0}
             elif message['type'] == "STORE":
                 time.sleep(message['delay'])
                 self.lock.acquire()
                 self.dict_key_val[message['key']] = message['value']
-
+                connect_socket.sendall(str.encode("SET value: {} for key: {}".format(message['value'], message['key'])))
+                connect_socket.close()
+                prop_msg = {"type": "propagate", 'key': message['key'], 'value': message['value']}
                 # send to propogate
-                propogate(message, port)
-                self.lock.acquire()
+                for port in ports:
+                    if port != my_port:
+                        logging.info("Message to be propagated to other replicas: {} to: {}".format(prop_msg, (host, port)))
+                        self.tcp_send(prop_msg, port)
+                self.lock.release()
             elif message['type'] == 'propagate':
-
-
-            connect_socket.close()
+                self.lock.acquire()
+                self.dict_key_val[message['key']] = message['value']
+                self.lock.release()
+                connect_socket.close()
         except error:
             connect_socket.close()
 
